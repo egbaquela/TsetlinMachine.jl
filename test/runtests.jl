@@ -2,5 +2,7 @@ using TsetlinMachine
 using Test
 
 @testset "TsetlinMachine.jl" begin
-    # Write your tests here.
+    @test TsetlinMachine.greet_tsetlin_machine() == "Hello TsetlinMachine!"
+    @test TsetlinMachine.greet_tsetlin_machine() != "Hello world!"
 end
+
