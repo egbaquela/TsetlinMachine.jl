@@ -1,0 +1,13 @@
+name = "TsetlinMachine"
+uuid = "2b948321-6d3d-4c14-9704-0823afe7f04c"
+authors = ["Enrique Gabriel Baquela"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
