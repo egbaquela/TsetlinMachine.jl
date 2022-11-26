@@ -181,3 +181,54 @@ function get_state(
 
     return tm.tsetlin_automaton_states[clause][feature][automaton_type]
 end
+
+
+"""
+    sum_up_clause_votes(
+        tm::TsetlinMachineBase)
+
+        Sum up the votes for each output decision (y=0 or y = 1).
+
+# Examples
+```julia-repl
+
+```
+"""
+function sum_up_clause_votes(
+    tm::TsetlinMachineBase)
+
+    output_sum = 0
+
+    for i in 1:tm.number_of_clauses
+        output_sum += tm.clause_output[i]*tm.clause_sign[i]
+    end
+
+    if output_sum > tm.threshold
+        output_sum = tm.threshold
+    elseif output_sum < -tm.threshold
+        output_sum = -tm.threshold
+    end
+
+    return output_sum
+end
+
+
+"""
+    predict(
+        tm::TsetlinMachineBase,
+        X::Vector{Int64})
+
+        Return predicted value.
+
+# Examples
+```julia-repl
+
+```
+"""
+function predict(
+    tm::TsetlinMachineBase,
+    X::Vector{Int64})
+
+
+end
+
