@@ -1,5 +1,5 @@
 import Random: randperm, shuffle!, shuffle, seed!
-import StatBase: sample
+import StatsBase: sample
 #import Printf.@printf
 #import LinearAlgebra
 #import LinearAlgebra: norm, Diagonal, dot
