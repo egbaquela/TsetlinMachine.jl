@@ -30,4 +30,9 @@ end
     @test length(aux_tm.clause_sign) == number_of_clauses
     @test length(aux_tm.clause_output) == number_of_clauses
     @test length(aux_tm.feedback_to_clauses) == number_of_clauses
+
+    @test state_to_action(aux_tm, 1) == 0
+    @test state_to_action(aux_tm, number_of_states) == 0
+    @test state_to_action(aux_tm, number_of_states + 1) == 1
+    @test state_to_action(aux_tm, number_of_states + 100) == 1
 end

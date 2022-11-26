@@ -15,6 +15,33 @@ struct TsetlinMachineBase
 	feedback_to_clauses::Vector{Int64}
 end
 
+"""
+    TsetlinMachineBase(
+        number_of_clauses::Int64,
+        number_of_features::Int64,
+        s::Float64,
+        number_of_states::Int64,
+        threshold::Int64)
+
+Create a basic Tsetlin Machine. This should be the constructor used.
+
+# Examples
+```julia-repl
+julia> number_of_clauses = 10;
+julia> number_of_features = 3;
+julia> s = 1.0;
+julia> number_of_states = 2;
+julia> threshold = 5;
+
+julia> aux_tm = TsetlinMachineBase(
+    number_of_clauses ,
+    number_of_features,
+    s,
+    number_of_states,
+    threshold)
+TsetlinMachineBase(10, 3, 1.0, 2, 5, [[[2, 2], [2, 2], [3, 2]], [[2, 2], [2, 3], [3, 2]], [[2, 2], [3, 3], [3, 3]], [[3, 2], [3, 2], [3, 2]], [[2, 2], [2, 2], [2, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 3], [2, 2]], [[3, 2], [3, 3], [3, 2]], [[2, 3], [2, 3], [2, 3]]], [1, -1, 1, -1, 1, -1, 1, -1, 1, -1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+```
+"""
 function TsetlinMachineBase(
     number_of_clauses::Int64,
 	number_of_features::Int64,
@@ -51,7 +78,32 @@ function TsetlinMachineBase(
         feedback_to_clauses)
 end
 
-# Translates automata state to action 
+"""
+    state_to_action(
+        tm::TsetlinMachineBase, 
+        state::Int64)
+
+Translate state to action.
+
+# Examples
+```julia-repl
+julia> number_of_clauses = 10;
+julia> number_of_features = 3;
+julia> s = 1.0;
+julia> number_of_states = 2;
+julia> threshold = 5;
+
+julia> aux_tm = TsetlinMachineBase(
+    number_of_clauses ,
+    number_of_features,
+    s,
+    number_of_states,
+    threshold);
+
+julia> state_to_action(aux_tm, 1)
+0
+```
+"""
 function state_to_action(tm::TsetlinMachineBase, state::Int64)
     result = 0
 	if state > tm.number_of_states
@@ -60,6 +112,34 @@ function state_to_action(tm::TsetlinMachineBase, state::Int64)
     return result
 end
 
+"""
+    calculate_clause_output!(
+        tm::TsetlinMachineBase, 
+        X::Vector{Int64})
+
+Updates claus outputs.
+
+# Examples
+```julia-repl
+julia> number_of_clauses = 10;
+julia> number_of_features = 3;
+julia> s = 1.0;
+julia> number_of_states = 2;
+julia> threshold = 5;
+
+julia> aux_tm = TsetlinMachineBase(
+    number_of_clauses ,
+    number_of_features,
+    s,
+    number_of_states,
+    threshold)
+TsetlinMachineBase(10, 3, 1.0, 2, 5, [[[2, 2], [2, 2], [3, 2]], [[2, 2], [2, 3], [3, 2]], [[2, 2], [3, 3], [3, 3]], [[3, 2], [3, 2], [3, 2]], [[2, 2], [2, 2], [2, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 3], [2, 2]], [[3, 2], [3, 3], [3, 2]], [[2, 3], [2, 3], [2, 3]]], [1, -1, 1, -1, 1, -1, 1, -1, 1, -1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+julia> calculate_clause_output!(aux_tm, [0,1,0])
+julia> aux_tm
+TsetlinMachineBase(10, 3, 1.0, 2, 5, [[[3, 3], [3, 3], [3, 2]], [[2, 2], [2, 2], [3, 2]], [[3, 3], [3, 3], [2, 2]], [[2, 2], [3, 3], [3, 2]], [[2, 3], [3, 2], [3, 3]], [[3, 2], [2, 3], [3, 3]], [[3, 3], [2, 3], [3, 3]], [[3, 3], [2, 2], [3, 2]], [[2, 3], [2, 3], [2, 3]], [[3, 3], [3, 2], [3, 3]]], [1, -1, 1, -1, 1, -1, 1, -1, 1, -1], [0, 0, 1, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+```
+"""
 function calculate_clause_output!(
     tm::TsetlinMachineBase, 
     X::Vector{Int64})
