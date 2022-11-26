@@ -32,7 +32,10 @@ function TsetlinMachineBase(
         tsetlin_automaton_state[i] = clause_automaton
     end
 
-    clause_sign = zeros(Int64, number_of_clauses)
+    clause_sign = ones(Int64, number_of_clauses)
+    for i in 2:2:number_of_clauses
+        clause_sign[i] = -1
+    end 
     clause_output = zeros(Int64, number_of_clauses)
     feedback_to_clauses = zeros(Int64, number_of_clauses)
 
