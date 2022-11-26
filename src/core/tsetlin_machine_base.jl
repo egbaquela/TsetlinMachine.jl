@@ -158,3 +158,26 @@ function calculate_clause_output!(
         end
     end
 end
+
+"""
+    get_state(
+        tm::TsetlinMachineBase, 
+        clause::Int64,
+        feature::Int64,
+        automaton_type::Int64)
+
+        Get the state of a specific automaton, indexed by clause, feature, and automaton type (include/include negated).
+
+# Examples
+```julia-repl
+
+```
+"""
+function get_state(
+    tm::TsetlinMachineBase,
+    clause::Int64,
+    feature::Int64,
+    automaton_type::Int64)
+
+    return tm.tsetlin_automaton_states[clause][feature][automaton_type]
+end
