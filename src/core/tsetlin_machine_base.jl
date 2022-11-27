@@ -241,6 +241,37 @@ end
 
 """
     sum_up_clause_votes(
+        tm::TsetlinMachineBase,
+        clause_output::Vector{Int64})
+
+        Sum up the votes for each output decision (y=0 or y = 1).
+
+# Examples
+```julia-repl
+
+```
+"""
+function sum_up_clause_votes(
+    tm::TsetlinMachineBase,
+    clause_output::Vector{Int64})
+
+    output_sum = 0
+
+    for i in 1:tm.number_of_clauses
+        output_sum += clause_output[i]*tm.clause_sign[i]
+    end
+
+    if output_sum > tm.threshold
+        output_sum = tm.threshold
+    elseif output_sum < -tm.threshold
+        output_sum = -tm.threshold
+    end
+
+    return output_sum
+end
+
+"""
+    sum_up_clause_votes(
         tm::TsetlinMachineBase)
 
         Sum up the votes for each output decision (y=0 or y = 1).
@@ -253,19 +284,7 @@ end
 function sum_up_clause_votes(
     tm::TsetlinMachineBase)
 
-    output_sum = 0
-
-    for i in 1:tm.number_of_clauses
-        output_sum += tm.clause_output[i]*tm.clause_sign[i]
-    end
-
-    if output_sum > tm.threshold
-        output_sum = tm.threshold
-    elseif output_sum < -tm.threshold
-        output_sum = -tm.threshold
-    end
-
-    return output_sum
+    return sum_up_clause_votes(tm, copy(tm.clause_output))
 end
 
 
@@ -285,6 +304,17 @@ function predict(
     tm::TsetlinMachineBase,
     X::Vector{Int64})
 
+    output_sum = 0
+    clause_output = calculate_clause_output(tm, X)
 
+    output_sum = sum_up_clause_votes(tm, clause_output)
+
+    if output_sum >= 0
+        output_sum = 1
+    else
+        output_sum = 0
+    end
+
+    return output_sum
 end
 
