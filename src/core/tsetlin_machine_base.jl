@@ -113,11 +113,60 @@ function state_to_action(tm::TsetlinMachineBase, state::Int64)
 end
 
 """
+    calculate_clause_output(
+        tm::TsetlinMachineBase, 
+        X::Vector{Int64})
+
+Calculate clause outputs.
+
+# Examples
+```julia-repl
+julia> number_of_clauses = 10;
+julia> number_of_features = 3;
+julia> s = 1.0;
+julia> number_of_states = 2;
+julia> threshold = 5;
+
+julia> aux_tm = TsetlinMachineBase(
+    number_of_clauses ,
+    number_of_features,
+    s,
+    number_of_states,
+    threshold)
+TsetlinMachineBase(10, 3, 1.0, 2, 5, [[[2, 2], [2, 2], [3, 2]], [[2, 2], [2, 3], [3, 2]], [[2, 2], [3, 3], [3, 3]], [[3, 2], [3, 2], [3, 2]], [[2, 2], [2, 2], [2, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 2], [3, 2]], [[3, 2], [2, 3], [2, 2]], [[3, 2], [3, 3], [3, 2]], [[2, 3], [2, 3], [2, 3]]], [1, -1, 1, -1, 1, -1, 1, -1, 1, -1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+julia> calculate_clause_output(aux_tm, [0,1,0])
+[0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
+```
+"""
+function calculate_clause_output(
+    tm::TsetlinMachineBase, 
+    X::Vector{Int64})
+
+    clause_output = copy(tm.clause_output)
+    for i in 1:tm.number_of_clauses
+        clause_output[i] = 1
+
+        for j in tm.number_of_features
+            action_include = state_to_action(tm, tm.tsetlin_automaton_states[i][j][1])
+            action_include_negated = state_to_action(tm, tm.tsetlin_automaton_states[i][j][2])
+
+            if (action_include == 1 && X[j] == 0) || (action_include_negated == 1 && X[j] == 1)
+                clause_output[i] = 0
+                break
+            end
+        end
+    end
+    return clause_output
+end
+
+
+"""
     calculate_clause_output!(
         tm::TsetlinMachineBase, 
         X::Vector{Int64})
 
-Updates claus outputs.
+Updates clause outputs.
 
 # Examples
 ```julia-repl
@@ -144,6 +193,8 @@ function calculate_clause_output!(
     tm::TsetlinMachineBase, 
     X::Vector{Int64})
 
+    #TODO: check which implementation has better performance
+    #=
     for i in 1:tm.number_of_clauses
         tm.clause_output[i] = 1
 
@@ -156,6 +207,11 @@ function calculate_clause_output!(
                 break
             end
         end
+    end
+    =#
+    clause_output = calculate_clause_output(tm, X)
+    for i in 1:tm.number_of_clauses
+        tm.clause_output[i] = clause_output[i]
     end
 end
 
