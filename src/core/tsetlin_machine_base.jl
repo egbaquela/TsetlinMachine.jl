@@ -78,6 +78,10 @@ function TsetlinMachineBase(
         feedback_to_clauses)
 end
 
+#############################################
+#  Auxiliary functions                      #
+#############################################
+
 """
     state_to_action(
         tm::TsetlinMachineBase, 
@@ -287,6 +291,9 @@ function sum_up_clause_votes(
     return sum_up_clause_votes(tm, copy(tm.clause_output))
 end
 
+#############################################
+# Prediction functions                      #
+#############################################
 
 """
     predict(
@@ -318,3 +325,139 @@ function predict(
     return output_sum
 end
 
+#############################################
+#  Training functions                       #
+#############################################
+
+"""
+    update!(
+        tm::TsetlinMachineBase,
+        X::Vector{Int64})
+
+        The Tsetlin Machine can be trained incrementally, one training example at a time.
+        Use this method directly for online and incremental training.
+# Examples
+```julia-repl
+
+```
+"""
+function update!(
+    tm::TsetlinMachineBase,
+    X::Vector{Int64},
+    y::Int64)
+
+    calculate_clause_output!(tm, X)
+    output_sum = sum_up_clause_votes(tm)
+
+
+	#####################################
+	## Calculate Feedback to Clauses    #
+	#####################################
+	# Initialize feedback to clauses
+	for i in 1:tm.number_of_clauses
+		tm.feedback_to_clauses[i] = 0
+    end
+
+    if y == 1
+        # Calculate feedback to clauses
+        for i in 1:tm.number_of_clauses
+            if rand() <= 1.0*(tm.threshold - output_sum)/(2*tm.threshold)
+                if tm.clause_sign[i] >= 0
+                    # Type I Feedback				
+                    tm.feedback_to_clauses[i] = 1
+                else
+                    # Type II Feedback
+                    tm.feedback_to_clauses[i] = -1
+                end
+            end
+        end
+
+    elseif y==0
+        # Calculate feedback to clauses
+        for i in 1:tm.number_of_clauses
+            if rand() <= 1.0*(tm.threshold - output_sum)/(2*tm.threshold)
+                if tm.clause_sign[i] >= 0
+                    # Type II Feedback				
+                    tm.feedback_to_clauses[i] = -1
+                else
+                    # Type I Feedback
+                    tm.feedback_to_clauses[i] = 1
+                end
+            end
+        end
+    end
+
+    for i in 1:tm.number_of_clauses
+        if tm.feedback_to_clauses[i] > 0
+            #######################################################
+            ### Type I Feedback (Combats False Negative Output) ###
+            #######################################################
+            if self.clause_output[j] == 0
+                for j in 1:tm.number_of_features
+                    if rand() <= 1.0/tm.s						
+                        if tm.tsetlin_automaton_states[i][j][0] > 1
+                            tm.ta_state[j,k,0] -= 1
+                        end
+                    end                          
+                    if rand() <= 1.0/tm.s							
+                        if tm.tsetlin_automaton_states[i][j][1] > 1
+                            tm.ta_state[j,k,1] -= 1
+                        end
+                    end 
+                end
+
+            elseif tm.clause_output[j] == 1
+                for j in 1:tm.number_of_features
+                    if X[j] == 1
+                        if rand() <= 1.0*(tm.s-1)/tm.s
+                            if tm.tsetlin_automaton_states[i][j][0] < tm.number_of_states*2
+                                tm.tsetlin_automaton_states[i][j][0] += 1
+                            end
+                        end
+
+                        if rand() <= 1.0/tm.s
+                            if tm.tsetlin_automaton_states[i][j][1] > 1
+                                tm.tsetlin_automaton_states[i][j][1] -= 1
+                            end
+                        end
+
+                    elseif X[j] == 0
+                        if rand() <= 1.0*(tm.s-1)/tm.s
+                            if tm.tsetlin_automaton_states[i][j][1] < tm.number_of_states*2
+                                tm.tsetlin_automaton_states[i][j][1] += 1
+                            end
+                        end
+
+                        if rand() <= 1.0/tm.s
+                            if tm.tsetlin_automaton_states[i][j][0] > 1
+                                tm.tsetlin_automaton_states[i][j][0] -= 1
+                            end
+                        end
+                    end
+                end
+            end
+        
+        elseif tm.feedback_to_clauses[i] < 0
+            ########################################################
+            ### Type II Feedback (Combats False Positive Output) ###
+            ########################################################
+            if tm.clause_output[i] == 1
+                for j in 1:tm.number_of_features
+                    action_include = state_to_action(tm, tm.tsetlin_automaton_states[i][j][0])
+                    action_include_negated = state_to_action(tm, tm.tsetlin_automaton_states[i][j][1])
+
+                    if X[j] == 0
+                        if (action_include == 0) && (tm.tsetlin_automaton_states[i][j][0] < tm.number_of_states*2)
+                            tm.tsetlin_automaton_states[i][j][0] += 1
+                        end
+                    elseif X[k] == 1
+                        if (action_include_negated == 0) && (tm.tsetlin_automaton_states[i][j][1] < self.number_of_states*2)
+                            tm.tsetlin_automaton_states[i][j][1] += 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+end
