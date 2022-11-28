@@ -6,7 +6,7 @@ struct TsetlinMachineBase
 	number_of_states::Int64
 	threshold::Int64
 
-    tsetlin_automaton_states::Array{Int64}
+    tsetlin_automaton_states::Array{Int64,3}
 	
 	clause_sign::Vector{Int64}
 
@@ -393,7 +393,7 @@ function fit!(
             #######################################################
             ### Type I Feedback (Combats False Negative Output) ###
             #######################################################
-            if self.clause_output[j] == 0
+            if tm.clause_output[i] == 0
                 for j in 1:tm.number_of_features
                     if rand() <= 1.0/tm.s						
                         if tm.tsetlin_automaton_states[i,j,1] > 1
@@ -407,7 +407,7 @@ function fit!(
                     end 
                 end
 
-            elseif tm.clause_output[j] == 1
+            elseif tm.clause_output[i] == 1
                 for j in 1:tm.number_of_features
                     if X[j] == 1
                         if rand() <= 1.0*(tm.s-1)/tm.s
@@ -451,8 +451,8 @@ function fit!(
                         if (action_include == 0) && (tm.tsetlin_automaton_states[i,j,1] < tm.number_of_states*2)
                             tm.tsetlin_automaton_states[i,j,1] += 1
                         end
-                    elseif X[k] == 1
-                        if (action_include_negated == 0) && (tm.tsetlin_automaton_states[i,j,2] < self.number_of_states*2)
+                    elseif X[j] == 1
+                        if (action_include_negated == 0) && (tm.tsetlin_automaton_states[i,j,2] < tm.number_of_states*2)
                             tm.tsetlin_automaton_states[i,j,2] += 1
                         end
                     end
@@ -490,7 +490,7 @@ function fit!(
     training_indexes = Vector(1:number_of_examples)
     for ep in 1:epochs
         shuffle!(training_indexes)
-        for i in 1:training_indexes
+        for i in training_indexes
             fit!(tm, X[i,:], y[i])
         end
     end
