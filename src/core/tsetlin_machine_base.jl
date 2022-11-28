@@ -462,3 +462,36 @@ function fit!(
     end
 
 end
+
+"""
+    fit!(
+        tm::TsetlinMachineBase,
+        X::Array{Int64},
+        y::Vector{Int64};
+        number_of_examples::Int64=2,
+        epochs::Int64=100))
+
+        Batch (offline) training of Tsetlin Machine.
+# Examples
+```julia-repl
+
+```
+"""
+function fit!(
+    tm::TsetlinMachineBase,
+    X::Array{Int64},
+    y::Vector{Int64};
+    batch_size::Int64=2,
+    epochs::Int64=100)
+
+    # Is assumes that size(X)[1] == length(y)
+
+    number_of_examples = size(X)[1]
+    training_indexes = Vector(1:number_of_examples)
+    for ep in 1:epochs
+        shuffle!(training_indexes)
+        for i in 1:training_indexes
+            fit!(tm, X[i,:], y[i])
+        end
+    end
+end
