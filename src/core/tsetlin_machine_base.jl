@@ -78,6 +78,19 @@ function TsetlinMachineBase(
         feedback_to_clauses)
 end
 
+function print(tm::TsetlinMachineBase; raw_print::Bool=false)
+    if raw_print==false
+        Base.println("TsetlinMachineBase")
+        Base.println("  number_of_clauses: ", tm.number_of_clauses)
+        Base.println("  number_of_features: ", tm.number_of_features)
+        Base.println("  s: ", tm.s)
+        Base.println("  number_of_states: ", tm.number_of_states)
+        Base.println("  threshold: ", tm.threshold)
+    else
+        Base.println(tm)
+    end
+end
+
 #############################################
 #  Auxiliary functions                      #
 #############################################
@@ -376,7 +389,7 @@ function fit!(
     elseif y==0
         # Calculate feedback to clauses
         for i in 1:tm.number_of_clauses
-            if rand() <= 1.0*(tm.threshold - output_sum)/(2*tm.threshold)
+            if rand() <= 1.0*(tm.threshold + output_sum)/(2*tm.threshold)
                 if tm.clause_sign[i] >= 0
                     # Type II Feedback				
                     tm.feedback_to_clauses[i] = -1
@@ -388,6 +401,7 @@ function fit!(
         end
     end
 
+
     for i in 1:tm.number_of_clauses
         if tm.feedback_to_clauses[i] > 0
             #######################################################
@@ -395,12 +409,12 @@ function fit!(
             #######################################################
             if tm.clause_output[i] == 0
                 for j in 1:tm.number_of_features
-                    if rand() <= 1.0/tm.s						
-                        if tm.tsetlin_automaton_states[i,j,1] > 1
+                    if rand() <= 1.0/tm.s 						
+                        if tm.tsetlin_automaton_states[i,j,1] > 1 
                             tm.tsetlin_automaton_states[i,j,1] -= 1
                         end
                     end                          
-                    if rand() <= 1.0/tm.s							
+                    if rand() <= 1.0/tm.s						
                         if tm.tsetlin_automaton_states[i,j,2] > 1
                             tm.tsetlin_automaton_states[i,j,2] -= 1
                         end
@@ -460,6 +474,7 @@ function fit!(
             end
         end
     end
+
 
 end
 

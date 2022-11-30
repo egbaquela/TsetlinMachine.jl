@@ -8,22 +8,24 @@ number_of_clauses = 20
 states = 100
 
 # Parameters of the pattern recognition problem
-number_of_features = 12
-number_of_classes = 2
+number_of_features = 16
+number_of_classes = 3
 
 # Training configuration
 epochs = 200
 
-training_data=open(readdlm,"../datasets/NoisyXORTrainingData.txt")
-training_data=convert(Array{Int64,2},training_data)
-test_data=open(readdlm,"../datasets/NoisyXORTestData.txt")
-test_data=convert(Array{Int64,2},test_data)
+data=open(readdlm,"../datasets/BinaryIrisData.txt")
+data=convert(Array{Int64,2},data)
 
-X_training = training_data[:, 1:12]
-y_training = training_data[:, 13]
+for row in size(data)[1]
+    data[row,17] = min(1,data[row,17])
+end
 
-X_test = test_data[:, 1:12]
-y_test = test_data[:, 13]
+X_training = data[:, 1:16]
+y_training = data[:, 17]
+
+X_test = data[:, 1:16]
+y_test = data[:, 17]
 
 tsetlin_machine = TsetlinMachine.TsetlinMachineBase(number_of_clauses, number_of_features, s, states, T)
 #TsetlinMachine.fit!(tsetlin_machine, X_training, y_training; epochs=epochs)
