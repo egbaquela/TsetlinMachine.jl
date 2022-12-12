@@ -28,7 +28,7 @@ y_test = test_data[:, 13]
 tsetlin_machine = TsetlinMachine.TsetlinMachineBase(number_of_clauses, number_of_features, s, states, T)
 #TsetlinMachine.fit!(tsetlin_machine, X_training, y_training; epochs=epochs)
 println(tsetlin_machine)
-TsetlinMachine.fit!(tsetlin_machine, X_test, y_test; epochs=epochs)
+TsetlinMachine.fit!(tsetlin_machine, X_test[1,:], y_test[1])#; epochs=epochs)
 println(tsetlin_machine)
 function accuracy(tm::TsetlinMachine.TsetlinMachineBase, X::Array{Int64}, y::Vector{Int64})
     errors=0
@@ -37,7 +37,7 @@ function accuracy(tm::TsetlinMachine.TsetlinMachineBase, X::Array{Int64}, y::Vec
         if prediction != y[i]
             errors += 1
         end
-        println(prediction, " - ", y[i])
+        #println(prediction, " - ", y[i])
     end
 
     println("Accuracy: ", (length(y)-errors)/length(y))
